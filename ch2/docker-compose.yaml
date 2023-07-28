@@ -1,0 +1,28 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - "./prometheus.v03.yml:/etc/prometheus/prometheus.yml"
+      - "./rules.yml:/etc/prometheus/rules.yml"
+    networks:
+      - localprom
+    ports:
+      - 9090:9090
+  node-exporter:
+    image: prom/node-exporter
+    networks:
+      - localprom
+    ports:
+      - 9100:9100
+  alert-manager:
+    image: prom/alertmanager
+    volumes:
+      - "./alertmanager.yml:/alertmanager/alertmanager.yml"
+    networks:
+      - localprom
+    ports:
+      - 9093:9093
+networks:
+  localprom:
+    driver: bridge

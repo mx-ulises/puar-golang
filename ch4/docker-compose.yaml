@@ -1,0 +1,31 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - localprom
+    ports:
+      - 9090:9090
+  pushgateway:
+    image: prom/pushgateway
+    networks:
+      - localprom
+    ports:
+      - 9091:9091
+  golang-job:
+    build: ./golang-job
+    networks:
+      - localprom
+  python-flask-prometheus-parser-app:
+    build: ./python-flask-prometheus-parser
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+    networks:
+      - localprom
+networks:
+  localprom:
+    driver: bridge
