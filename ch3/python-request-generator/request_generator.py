@@ -1,19 +1,19 @@
-import time
-import requests
+import os
 import random
-from threading import Thread
+import requests
+import time
 
-SAVE_RATE = 0.8
-SAVE_ENDPOINT = "http://golang-app:8080/save?coins="
-SPEND_ENDPOINT = "http://golang-app:8080/spend?coins="
+ENDPOINT_PATTERN = "http://{server}:{port}/{path}?coins="
 
-def send_request():
+def send_request(server: str, port: str, save_rate: float):
+    save_endpoint = ENDPOINT_PATTERN.format(server=server, port=port, path="save")
+    spend_endpoint = ENDPOINT_PATTERN.format(server=server, port=port, path="spend")
     while True:
         try:
             coins = random.randint(1, 100)
-            endpoint = SAVE_ENDPOINT
-            if SAVE_RATE < random.random():
-                endpoint = SPEND_ENDPOINT
+            endpoint = save_endpoint
+            if save_rate < random.random():
+                endpoint = spend_endpoint
             endpoint += str(coins)
             response = requests.get(endpoint)
             print(f"Request {endpoint}. Status Code:", response.status_code)
@@ -22,4 +22,7 @@ def send_request():
         time.sleep(0.1)  # 100 milliseconds is 0.1 seconds
 
 if __name__ == "__main__":
-    send_request()
+    server = os.getenv("TARGET_SERVER", "golang-app")
+    port = os.getenv("TARGET_PORT", "8080")
+    save_rate = float(os.getenv("SAVE_RATE", "0.5"))
+    send_request(server, port, save_rate)

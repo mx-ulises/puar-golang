@@ -18,6 +18,10 @@ services:
       - localprom
   python-request-generator:
     build: ./python-request-generator
+    environment:
+      - TARGET_SERVER=golang-app
+      - TARGET_PORT=8080
+      - SAVE_RATE=0.5
     networks:
       - localprom
 networks:
