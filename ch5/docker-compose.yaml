@@ -1,0 +1,25 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - localprom
+    ports:
+      - 9090:9090
+  golang-labels-app:
+    build: ./golang-labels-app
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+    networks:
+      - localprom
+  python-request-generator:
+    build: ../ch3/python-request-generator
+    networks:
+      - localprom
+networks:
+  localprom:
+    driver: bridge
