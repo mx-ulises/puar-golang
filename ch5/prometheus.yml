@@ -5,7 +5,11 @@ scrape_configs:
    static_configs:
     - targets:
        - prometheus:9090
- - job_name: golang-labels-app
+ - job_name: golang-labels-app-v1
    static_configs:
     - targets:
-       - golang-labels-app:8080
+       - golang-labels-app-v1:8080
+ - job_name: golang-labels-app-v2
+   static_configs:
+    - targets:
+       - golang-labels-app-v2:8081

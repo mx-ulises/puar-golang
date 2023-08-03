@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -59,6 +60,22 @@ var (
 		},
 		[]string{"path"},
 	)
+
+	spendingAllowStatus = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "puar_golang_account_lock_status",
+			Help: "Status of the spending lock",
+		},
+		[]string{"status"},
+	)
+
+	appVersion = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "puar_golang_version",
+			Help: "App Version running",
+		},
+		[]string{"version"},
+	)
 )
 
 // Create the children to reduce lookup time:
@@ -78,7 +95,15 @@ var (
 	spentCoinCount         = transtactionCoinTotal.With(spendPathLabel)
 	spendAverageLatency    = averageLatency.With(spendPathLabel)
 	spendPercentileLatency = percentileLatency.With(spendPathLabel)
+
+	// Spend block status Metric
+	spendPathLockLabel   = prometheus.Labels{"status": "BLOCK"}
+	spendStatusLock      = spendingAllowStatus.With(spendPathLockLabel)
+	spendPathUnlockLabel = prometheus.Labels{"status": "UNBLOCK"}
+	spendStatusUnlock    = spendingAllowStatus.With(spendPathUnlockLabel)
 )
+
+var allowSpending = true
 
 func init() {
 	prometheus.MustRegister(requestTotal)
@@ -87,9 +112,16 @@ func init() {
 	prometheus.MustRegister(coinBalance)
 	prometheus.MustRegister(averageLatency)
 	prometheus.MustRegister(percentileLatency)
+	prometheus.MustRegister(spendingAllowStatus)
+	prometheus.MustRegister(appVersion)
+
+	appVersionLabel := prometheus.Labels{"version": os.Getenv("VERSION")}
+	appVersion.With(appVersionLabel).Set(1.0)
+	spendStatusLock.Set(0.0)
+	spendStatusUnlock.Set(1.0)
 }
 
-func generalHandler(
+func GeneralHandler(
 	requestCount *prometheus.Counter,
 	requestErrorCount *prometheus.Counter,
 	coinCount *prometheus.Counter,
@@ -151,17 +183,35 @@ func generalHandler(
 	(*percentileLatency).Observe(diff)
 }
 
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-	generalHandler(&saveRequestCount, &saveRequestErrorCount, &savedCoinCount, &savedAverageLatency, &savedPercentileLatency, "Save", &w, r, 1)
+func SaveHandler(w http.ResponseWriter, r *http.Request) {
+	GeneralHandler(&saveRequestCount, &saveRequestErrorCount, &savedCoinCount, &savedAverageLatency, &savedPercentileLatency, "Save", &w, r, 1)
 }
 
-func spendHandler(w http.ResponseWriter, r *http.Request) {
-	generalHandler(&spendRequestCount, &spendRequestErrorCount, &spentCoinCount, &spendAverageLatency, &spendPercentileLatency, "Spend", &w, r, -1)
+func SpendHandler(w http.ResponseWriter, r *http.Request) {
+	if allowSpending {
+		GeneralHandler(&spendRequestCount, &spendRequestErrorCount, &spentCoinCount, &spendAverageLatency, &spendPercentileLatency, "Spend", &w, r, -1)
+	}
+}
+
+func LockSpending(w http.ResponseWriter, r *http.Request) {
+	allowSpending = false
+	spendStatusLock.Set(1.0)
+	spendStatusUnlock.Set(0.0)
+	fmt.Fprint(w, "Successful lock operation")
+}
+
+func UnlockSpending(w http.ResponseWriter, r *http.Request) {
+	allowSpending = true
+	spendStatusLock.Set(0.0)
+	spendStatusUnlock.Set(1.0)
+	fmt.Fprint(w, "Successful unlock operation")
 }
 
 func main() {
-	http.HandleFunc("/save", saveHandler)
-	http.HandleFunc("/spend", spendHandler)
+	http.HandleFunc("/save", SaveHandler)
+	http.HandleFunc("/spend", SpendHandler)
+	http.HandleFunc("/lock", LockSpending)
+	http.HandleFunc("/unlock", UnlockSpending)
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }

@@ -8,12 +8,22 @@ services:
       - localprom
     ports:
       - 9090:9090
-  golang-labels-app:
+  golang-labels-app-v1:
     build: ./golang-labels-app
     ports:
       - 8080:8080
     environment:
       - PORT=8080
+      - VERSION=1.0
+    networks:
+      - localprom
+  golang-labels-app-v2:
+    build: ./golang-labels-app
+    ports:
+      - 8081:8081
+    environment:
+      - PORT=8081
+      - VERSION=2.0
     networks:
       - localprom
   python-request-generator:
