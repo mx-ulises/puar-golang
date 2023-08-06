@@ -1,5 +1,9 @@
 # Instructions
 
+You can access a comprehensive tutorial of these examples on [this Medium Post](https://medium.com/@mxulises/simple-prometheus-setup-on-docker-compose-f702d5f98579).
+
+![Diagram of the architecture of this orchestration](./images/prometheus_setup_in_docker_compose.png)
+
 ## Pre-requisites:
 
  - [Install Docker](https://docs.docker.com/get-docker/)
@@ -20,5 +24,3 @@
     docker compose down
     ```
 
-# Details
-You can access a comprehensive tutorial of these examples on [this Substack Post](https://mxulises.substack.com/p/simple-prometheus-setup-on-docker).
