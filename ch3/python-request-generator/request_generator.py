@@ -3,7 +3,7 @@ import random
 import requests
 import time
 
-ENDPOINT_PATTERN = "http://{server}:{port}/{path}?coins="
+ENDPOINT_PATTERN = "http://{server}:{port}/v1/{path}?coins="
 
 def send_request(server: str, port: str, save_rate: float):
     save_endpoint = ENDPOINT_PATTERN.format(server=server, port=port, path="save")

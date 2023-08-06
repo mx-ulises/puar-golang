@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -89,7 +90,7 @@ func init() {
 	prometheus.MustRegister(percentileLatency)
 }
 
-func generalHandler(
+func GeneralHandler(
 	requestCount *prometheus.Counter,
 	requestErrorCount *prometheus.Counter,
 	coinCount *prometheus.Counter,
@@ -149,17 +150,17 @@ func generalHandler(
 	percentileLatency.Observe(diff)
 }
 
-func saveHandler(w http.ResponseWriter, r *http.Request) {
-	generalHandler(&saveRequestCount, &saveRequestErrorCount, &savedCoinCount, "Save", &w, r, 1)
+func SaveHandler(w http.ResponseWriter, r *http.Request) {
+	GeneralHandler(&saveRequestCount, &saveRequestErrorCount, &savedCoinCount, "Save", &w, r, 1)
 }
 
-func spendHandler(w http.ResponseWriter, r *http.Request) {
-	generalHandler(&spendRequestCount, &spendRequestErrorCount, &spentCoinCount, "Spend", &w, r, -1)
+func SpendHandler(w http.ResponseWriter, r *http.Request) {
+	GeneralHandler(&spendRequestCount, &spendRequestErrorCount, &spentCoinCount, "Spend", &w, r, -1)
 }
 
 func main() {
-	http.HandleFunc("/save", saveHandler)
-	http.HandleFunc("/spend", spendHandler)
+	http.HandleFunc("/v1/save", SaveHandler)
+	http.HandleFunc("/v1/spend", SpendHandler)
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }

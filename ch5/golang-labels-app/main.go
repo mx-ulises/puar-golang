@@ -80,16 +80,16 @@ var (
 
 // Create the children to reduce lookup time:
 var (
-	// Metric children for '/save' path
-	savePathLabel          = prometheus.Labels{"path": "/save"}
+	// Metric children for '/v1/save' path
+	savePathLabel          = prometheus.Labels{"path": "/v1/save"}
 	saveRequestCount       = requestTotal.With(savePathLabel)
 	saveRequestErrorCount  = requestError.With(savePathLabel)
 	savedCoinCount         = transtactionCoinTotal.With(savePathLabel)
 	savedAverageLatency    = averageLatency.With(savePathLabel)
 	savedPercentileLatency = percentileLatency.With(savePathLabel)
 
-	// Metric children for '/spend' path
-	spendPathLabel         = prometheus.Labels{"path": "/spend"}
+	// Metric children for '/v1/spend' path
+	spendPathLabel         = prometheus.Labels{"path": "/v1/spend"}
 	spendRequestCount      = requestTotal.With(spendPathLabel)
 	spendRequestErrorCount = requestError.With(spendPathLabel)
 	spentCoinCount         = transtactionCoinTotal.With(spendPathLabel)
@@ -208,10 +208,10 @@ func UnlockSpending(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/save", SaveHandler)
-	http.HandleFunc("/spend", SpendHandler)
-	http.HandleFunc("/lock", LockSpending)
-	http.HandleFunc("/unlock", UnlockSpending)
+	http.HandleFunc("/v1/save", SaveHandler)
+	http.HandleFunc("/v1/spend", SpendHandler)
+	http.HandleFunc("/v1/lock", LockSpending)
+	http.HandleFunc("/v1/unlock", UnlockSpending)
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
