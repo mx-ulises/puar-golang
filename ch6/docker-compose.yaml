@@ -1,0 +1,27 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - localprom
+    ports:
+      - 9090:9090
+  node-exporter:
+    image: prom/node-exporter
+    networks:
+      - localprom
+    ports:
+      - 9100:9100
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning
+    networks:
+      - localprom
+    ports:
+      - 3000:3000
+networks:
+  localprom:
+    driver: bridge
