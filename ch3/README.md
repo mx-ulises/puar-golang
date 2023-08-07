@@ -24,4 +24,3 @@ You can access a comprehensive tutorial of these examples on [this Medium Post](
     ```
     docker compose down
     ```
-
