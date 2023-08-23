@@ -1,0 +1,59 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - localprom
+    ports:
+      - 9090:9090
+  golang-labels-app-1:
+    build: ./golang-consul-app
+    container_name: golang-labels-app-1
+    environment:
+      - NAME=golang-labels-app-1
+      - PORT=8080
+      - VERSION=1.0
+    networks:
+      - localprom
+    depends_on:
+      - consul
+  python-request-generator-1:
+    build: ../ch3/python-request-generator
+    environment:
+      - TARGET_SERVER=golang-labels-app-1
+      - TARGET_PORT=8080
+      - SAVE_RATE=0.5
+    networks:
+      - localprom
+  golang-labels-app-2:
+    build: ./golang-consul-app
+    container_name: golang-labels-app-2
+    environment:
+      - NAME=golang-labels-app-2
+      - PORT=8080
+      - VERSION=1.0
+    networks:
+      - localprom
+    depends_on:
+      - consul
+  python-request-generator-2:
+    build: ../ch3/python-request-generator
+    environment:
+      - TARGET_SERVER=golang-labels-app-2
+      - TARGET_PORT=8080
+      - SAVE_RATE=0.5
+    networks:
+      - localprom
+  consul:
+    image: hashicorp/consul
+    container_name: consul
+    ports:
+      - 8500:8500
+    command: "agent -dev -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0"
+    networks:
+      - localprom
+networks:
+  localprom:
+    driver: bridge
