@@ -126,8 +126,9 @@ func ConsulRegistration(consulAddress string, hostname string, port string) {
 		Address: hostname,
 		Tags:    []string{"puar", "production"},
 		Check: &api.AgentServiceCheck{
-			HTTP:     "http://" + hostname + ":" + port + "/v1/spend",
-			Interval: "10s",
+			HTTP:                           "http://" + hostname + ":" + port + "/v1/spend",
+			Interval:                       "10s",
+			DeregisterCriticalServiceAfter: "1s",
 		},
 	}
 
