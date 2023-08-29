@@ -6,12 +6,10 @@ rules:
 - apiGroups: ["", "extensions"]
   resources:
   - nodes
-  - nodes/proxy
   - nodes/metrics
   - services
   - endpoints
   - pods
-  - ingresses
   verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+- nonResourceURLs: ["/metrics"]
   verbs: ["get"]
