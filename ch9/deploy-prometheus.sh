@@ -10,3 +10,6 @@ kubectl apply -f ${KUBERNETES_SPECS_DIR}/prometheus-config-ConfigMap.yaml
 kubectl apply -f ${KUBERNETES_SPECS_DIR}/prometheus-Deployment.yaml
 kubectl apply -f ${KUBERNETES_SPECS_DIR}/prometheus-Service.yaml
 
+echo "----------------------------------------"
+echo "Access Prometheus in:\n\n  - http://localhost:8001/api/v1/namespaces/prometheus/services/prometheus/proxy/\n"
+echo "----------------------------------------"
