@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balance-app
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: balance-app
+  replicas: 10
+  template:
+    metadata:
+      labels:
+        app: balance-app
+    spec:
+      containers:
+      - name: request-generator
+        image: mxulises/python-request-generator:latest
+        #imagePullPolicy: Never
+        env:
+          - name: TARGET_SERVER
+            value: "localhost"
+          - name: TARGET_PORT
+            value: "8080"
+          - name: SAVE_RATE
+            value: "0.35"
+      - name: balance-app
+        image: mxulises/golang-balance-app:latest
+        #imagePullPolicy: Never
+        ports:
+        #- containerPort: 8080
+        #  name: default
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
+        env:
+          - name: PORT
+            value: "8080"
+          - name: VERSION
+            value: "1.0"
