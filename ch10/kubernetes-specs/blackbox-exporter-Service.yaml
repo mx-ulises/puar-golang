@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: blackbox-exporter
+  namespace: prometheus
+spec:
+  selector:
+    app: blackbox-exporter
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 9115
+    targetPort: 9115

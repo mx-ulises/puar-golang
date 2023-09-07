@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: grafana
+  namespace: prometheus
+spec:
+  selector:
+    app: grafana
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 9115
+    targetPort: 9115

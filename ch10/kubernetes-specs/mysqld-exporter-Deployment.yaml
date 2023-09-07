@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysqld-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: mysqld-exporter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysqld-exporter
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: mysqld-exporter
+        image: prom/mysqld-exporter:latest
+        #command: ["sleep", "36000"]
+        ports:
+        - containerPort: 9104
+          name: metrics
+          protocol: TCP
+        env:
+        - name: DATA_SOURCE_NAME
+          value: prometheus:password@(mysql:3306)/prometheus
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/mysqld-exporter
+      volumes:
+      - name: config-volume
+        configMap:
+          name: mysqld-exporter-config

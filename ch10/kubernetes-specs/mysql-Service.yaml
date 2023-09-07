@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: prometheus
+spec:
+  selector:
+    app: mysql
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306

@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysqld-exporter
+  namespace: prometheus
+spec:
+  selector:
+    app: mysqld-exporter
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 9104
+    targetPort: 9104

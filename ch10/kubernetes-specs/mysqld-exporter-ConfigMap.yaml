@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysqld-exporter-config
+  namespace: prometheus
+data:
+  .my.cnf: |
+    [client]
+    user=prometheus
+    password=password
+    host=mysql

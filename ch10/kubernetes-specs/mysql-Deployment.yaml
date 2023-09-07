@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: mysql
+        image: mysql
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_DATABASE
+          value: prometheus
+        - name: MYSQL_USER
+          value: prometheus
+        - name: MYSQL_PASSWORD
+          value: password

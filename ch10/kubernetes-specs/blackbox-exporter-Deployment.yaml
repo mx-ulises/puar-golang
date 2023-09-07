@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blackbox-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: blackbox-exporter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: blackbox-exporter
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: blackbox-exporter
+        image: prom/blackbox-exporter:latest
+        ports:
+        - containerPort: 9115
+          name: metrics
+          protocol: TCP
