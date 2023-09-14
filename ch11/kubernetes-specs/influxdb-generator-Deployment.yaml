@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: influxdb-exporter
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: influxdb-exporter
+    spec:
+      containers:
+      - name: influxdb-exporter
+        image: prom/influxdb-exporter:latest
+        ports:
+        - containerPort: 9122
+          name: metrics
+          protocol: TCP
+      - name: influxdb-generator
+        image: mxulises/influxdb-python-generator:latest
+        #imagePullPolicy: Never
+        env:
+          - name: TARGET_SERVER
+            value: "localhost"
+          - name: TARGET_PORT
+            value: "9122"
+          - name: POSITIVE_RATE
+            value: "0.50"
