@@ -1,0 +1,22 @@
+version: '3'
+services:
+  golang-custom-exporter:
+    build: ./golang-custom-exporter
+    container_name: golang-custom-exporter
+    ports:
+      - 8000:8000
+    networks:
+      - localprom
+    depends_on:
+      - consul
+  consul:
+    image: hashicorp/consul
+    container_name: consul
+    ports:
+      - 8500:8500
+    command: "agent -dev -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0"
+    networks:
+      - localprom
+networks:
+  localprom:
+    driver: bridge
